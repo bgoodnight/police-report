@@ -1,0 +1,166 @@
+---
+title: "Reports by State"
+author: "Centers for Disease Control and Prevention"
+date: "February 5, 2018"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**What percentage of officers are**  **trained in responding to overdose****?**
+
+**[Insert % of officers trained, by jurisdiction type]**
+
+**What percentage of officers work in departments that equip some or all officers to**  **carry naloxone** **(this may not mean that every officer is equipped with naloxone)?**
+
+**       ** **[Insert % of officers from carrying departments, by jurisdiction type]**
+
+**How many**  **overdose calls**  **have officers responded to**  **in the past 6 months****?**
+
+**[If the average number of calls answered is &gt;1, list the average, by jurisdiction type. If the average number of calls is&lt;1, list the % of officers who have responded to at least 1 call, by jurisdiction type]**
+
+**How many overdoses have officers**  **reversed with naloxone**** in the past 6 months ****?**
+
+**[If the average number of reversals is &gt;1, list the average, by jurisdiction type. If the average number of reversals is&lt;1, list the % of officers who have reversed at least 1 overdose, by jurisdiction type]**
+
+**[STATE]**
+
+**_AMONG OFFICERS WHO HAVE RESPONDED TO AT LEAST ONE OVERDOSE CALL IN THE PAST 6 MONTHS:_**
+
+**How commonly are victims of an overdose arrested during the overdose call?**
+
+[Insert the percentage of officers who have arrested at least one overdose victim in the past 6 months, by jurisdiction type]
+
+**How commonly are witnesses to an overdose arrested during the overdose call?**
+
+[Insert the percentage of officers who have arrested at least one overdose witness in the past 6 months, by jurisdiction type]
+
+**How would you describe the attitude of officers in your department about carrying and administering naloxone?**
+
+[Insert visual depiction of perceived attitudes about naloxone, by jurisdiction type]
+
+
+
+
+
+**[STATE]**
+
+**Does [INSERT STATE CODE]**  **have a 911 Good Samaritan Law in effect?**  **YES**** / ****NO**
+
+**[Insert % of officers who answered correctly]**
+
+**Does [INSERT STATE CODE]**  **provide immunity from**  **arrest****? **** YES ****/**** NO**
+
+**[Insert % of officers who answered correctly]**
+
+**Does [INSERT STATE CODE]**  **provide immunity from**  **criminal charges****? **** YES ****/**** NO**
+
+**[Insert % of officers who answered correctly]**
+
+**[STATE]**
+
+**Percentage of [STATE] patrol officers who desire additional training in the following topics:**
+
+- **Identifying and responding to opioid overdoses:**
+
+**[Insert % of officers who chose this training topic, by jurisdiction]**
+
+** **
+
+- **The safe handling of opioids and other illicit substances in the field:**
+
+**[Insert % of officers who chose this training topic, by jurisdiction]**
+
+- **The clinical science and psychology of opioid use disorder (addiction):**
+
+**[Insert % of officers who chose this training topic, by jurisdiction]**
+
+- **Provisions and procedures related to [STATE&#39;s] 911 Good Samaritan Law:**
+
+**[Insert % of officers who chose this training topic, by jurisdiction]**
+
+- **Medical, social, and psychological services available in [STATE] for people experiencing opioid use disorder (addiction) and their families:**
+
+**[Insert % of officers who chose this training topic, by jurisdiction]**
+
+- **Training already received is satisfactory:**
+
+**[Insert % of officers who chose this training topic, by jurisdiction]**
+
+**Other training topics suggested:**
+
+**       ** [Insert bullet list of additional  suggestions from the &quot;Other&quot; text box on the survey]
+
+**[STATE]**
+
+**These agencies should be involved in post-overdose outreach efforts to connect the overdose victim with treatment and other services.**
+
+[Insert visual depiction of which groups officers elected to be appropriate for post-overdose outreach. Do not break out by jurisdiction.  There&#39;s no right way to do this, the only concern is that any color coding across various bar charts or stratification needs to be consistent across the document (i.e. County police are always blue. YES responses are always yellow, etc)]
+
+**[STATE]**
+
+[Show, through numbers or visuals, the percent of officers who AGREED with the following statements. Do not break out by jurisdiction]
+
+**911 Good Samaritan Laws**
+
+- A 911 Good Samaritan Law increases the number of 911 calls by people who witness an overdose.
+- 911 Good Samaritan Laws may encourage more opioid use by sending the message that drug use is OK.
+- 911 Good Samaritan Laws save lives
+
+**Overdose Response Procedures and Protocols**
+
+- It is important for police officers to be present at the scene of an overdose to protect medical personnel.
+- It is important for police officers to be present at the scene of an overdose, because they may be the first responder to arrive on the scene with Naloxone and save a life.
+- It is important for police officers to be present at the scene of an overdose to enforce the law.
+
+**Naloxone Training, Carry, and Distribution**
+
+- I am worried about the liability of officers who carry and/or administer naloxone.
+- Programs to train and distribute naloxone to lay community members to treat overdose save lives.
+- Programs to train and distribute naloxone to lay community members may encourage opioid use by sending the message that drug use is OK.
+- Training community members how to identify and respond to an overdose may encourage opioid drug use by sending the message that drug use is OK.
+
+**[STATE]**
+
+**Fentanyl in the Drug Supply**
+
+- I am worried about myself and other first responders who are called to assist persons suffering overdose, because there is so much fentanyl in the drug supply.
+- I am worried about people who use drugs, because there is so much fentanyl in the drug supply.
+
+**Opioid Misuse and Opioid Use Disorder**
+
+- Opioid misuse is a disease that should be dealt with through treatment and support services.
+- Arrest can play an important role in helping drug users change their behavior.
+
+**[STATE]**
+
+**Personal Connection to the Opioid Epidemic**
+
+**       ** [Insert visual that shows the percentage of officers who know someone who has lived with a substance use disorder AND the percentage of officers who know someone who has experienced an overdose. Break out by jurisdiction]
+
+
+
+**Other blurbs will go here to describe what these data correlate with, if anything JENNIFER WILL UPDATE STATE BY STATE:**
+
+- **** Example 1
+- **** Example 2
+- **** Example 3
+
+**[STATE]**
+
+**A total of 2869 patrol officers from 20 states participated in this survey.
+XX (XX%) of those officers serve in [STATE].**
+
+
+
+**Insert here descriptive stats and/or visuals for the following [N(%)]**
+
+- Jurisdiction of respondents (State, county, city, town, village)
+- Reported size of the respondents&#39; department (&lt;9, 10-19, 20-49, 50-99, 100-499, &gt;500)
+- Number of years on the force (we&#39;ll give this to you as a continuous variable and as a categorical variable with pre-set cut points)
+- Age
+- Gender (Participants were REALLY touchy about age and gender. Many can only imagine nefarious ways to use this information. So, depending  on how we can show this, we might decide to just cut out the presentation of these variables in the front matter (the section with the pretty pictures))
