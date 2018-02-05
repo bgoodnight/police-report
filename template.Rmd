@@ -3,13 +3,14 @@ title: "Reports by State"
 author: "Centers for Disease Control and Prevention"
 date: "February 5, 2018"
 output:
-  pdf_document: default
   word_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+**`r data[1,'state']`**
 
 **What percentage of officers are**  **trained in responding to overdose****?**
 
@@ -68,8 +69,6 @@ knitr::opts_chunk$set(echo = TRUE)
 - **Identifying and responding to opioid overdoses:**
 
 **[Insert % of officers who chose this training topic, by jurisdiction]**
-
-** **
 
 - **The safe handling of opioids and other illicit substances in the field:**
 
@@ -146,9 +145,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 **Other blurbs will go here to describe what these data correlate with, if anything JENNIFER WILL UPDATE STATE BY STATE:**
 
-- **** Example 1
-- **** Example 2
-- **** Example 3
+- Example 1
+- Example 2
+- Example 3
 
 **[STATE]**
 
