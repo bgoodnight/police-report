@@ -8,11 +8,24 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(reshape2)
 knitr::opts_chunk$set(echo = TRUE)
+if (!exists("survey")) { 
+     survey = read.csv('data.csv')
+     state <- 'RI'
+     data <- survey[ which(survey$state==state ), ]
+}
 ```
 **`r data[1,'state']`**
 
 **What percentage of officers are**  **trained in responding to overdose****?**
+
+```{r}
+jurisdiction <- group_by(data, jurisdiction)
+summarise(jurisdiction, Percent = sum(add_training_identify_and_respon) / n())
+```
 
 **[Insert % of officers trained, by jurisdiction type]**
 
