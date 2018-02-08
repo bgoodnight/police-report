@@ -3,8 +3,8 @@ title: "HIDA State Report"
 author: "Centers for Disease Control and Prevention"
 date: "February 5, 2018"
 output:
-  pdf_document: default
   word_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -21,23 +21,25 @@ if (!exists("survey")) {
 jurisdiction <- group_by(data, jurisdiction)
 ```
 
-#State Report for `r state.name[grep(state, state.abb)]`
+# State Report for `r state.name[grep(state, state.abb)]`
 
-1. What percentage of the `r nrow(data)` officers in `r state.name[grep(state, state.abb)]` are trained in responding to overdose?
+## Survey Responses from `r nrow(data)` officers
+
+### Of the `r nrow(data)` officers in `r state.name[grep(state, state.abb)]` that took this survey how many are trained in responding to overdose?
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = n(), Trained = sum(add_training_identify_and_respon), Percent = (sum(add_training_identify_and_respon) / n())*100), digits=2, col.names = c('Jurisdiction','Officers','Trained','Percent'))
 
 ```
 
-2. What percentage of officers work in departments that equip some or all officers to carry naloxone (this may not mean that every officer is equipped with naloxone)?
+### What percentage of officers work in departments that equip some or all officers to carry naloxone (this may not mean that every officer is equipped with naloxone)?
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = n(), Naloxone = sum(narcan_carry), Percent = (sum(narcan_carry) / n())*100), digits=2, col.names = c('Jurisdiction','Officers','Naloxone','Percent'))
 
 ```
 
-3. How many overdose calls have officers responded to in the past 6 months?
+### How many overdose calls have officers responded to in the past 6 months?
 
 ```{r echo=FALSE}
 if(mean(data$num_overdose_calls, na.rm=TRUE)>1){
@@ -47,7 +49,7 @@ kable(summarise(jurisdiction, Officers = n(), Total = sum(num_overdose_calls, na
 }
 ```
 
-4. How many overdoses have officers  reversed with naloxone in the past 6 months ?
+### How many overdoses have officers  reversed with naloxone in the past 6 months ?
 
 ```{r echo=FALSE}
 if(mean(data$num_naloxone_administer, na.rm=TRUE)>1){
@@ -57,23 +59,29 @@ kable(summarise(jurisdiction, Officers = n(), Total = sum(num_naloxone_administe
 }
 ```
 
-##Among officers who have responded to at least one overdose call in the past 6 months:
+\newpage
 
-1. How commonly are victims of an overdose arrested during the overdose call?
+## Responses from `r sum(data$num_overdose_calls>0, na.rm=TRUE)` officers who reported having responded to at least one overdose call in the past 6 months
+
+### How commonly are victims of an overdose arrested during the overdose call?
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = sum(num_overdose_calls>0, na.rm=TRUE), Calls = sum(num_overdose_calls, na.rm=TRUE), Arrests = sum(od_arrest, na.rm=TRUE), Percent = (Arrests/Calls)*100), digits=2, col.names = c('Jurisdiction','Officers','Calls','Arrests','% Arrested'))
 ```
 
-2. How commonly are witnesses to an overdose arrested during the overdose call?
+### How commonly are witnesses to an overdose arrested during the overdose call?
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = sum(num_overdose_calls>0, na.rm=TRUE), Calls = sum(num_overdose_calls, na.rm=TRUE), Arrests = sum(overdose_witness_arrest,na.rm=TRUE), Percent = (Arrests/Calls)*100), digits=2, col.names = c('Jurisdiction','Officers','Calls','Arrests','% Arrested'))
 ```
 
-3. How would you describe the attitude of officers in your department about carrying and administering naloxone?
+\newpage
 
->**[Insert visual depiction of perceived attitudes about naloxone, by jurisdiction type]**
+##Attitudes
+
+### How would you describe the attitude of officers in your department about carrying and administering naloxone?
+
+>**Need visualization feedback before dividing by Jurisdiction - Bradley**
 
 ```{r echo=FALSE, message=FALSE}
 library(ggplot2)
@@ -84,71 +92,87 @@ qplot(graphdata) +
   coord_flip()
 ```
 
-4. Does `r state.name[grep(state, state.abb)]` have a 911 Good Samaritan Law in effect?
+\newpage
+
+##Knowledge
+
+### Does `r state.name[grep(state, state.abb)]` have a 911 Good Samaritan Law in effect?
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = n(), Correct = sum(gsl_na>0, na.rm=TRUE), Percent = (Correct/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Correct','% Correct'))
 ```
 
-6. Does `r state.name[grep(state, state.abb)]` provide immunity from arrest?  YES / NO
+### Does `r state.name[grep(state, state.abb)]` provide immunity from arrest?
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = n(), Correct = sum(gsl_arrest>0, na.rm=TRUE), Percent = (Correct/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Correct','% Correct'))
 ```
 
-7. Does `r state.name[grep(state, state.abb)]` provide immunity from  criminal charges?  YES / NO
+### Does `r state.name[grep(state, state.abb)]` provide immunity from  criminal charges?
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = n(), Correct = sum(gsl_charge>0, na.rm=TRUE), Percent = (Correct/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Correct','% Correct'))
 ```
 
-8. Percentage of `r state.name[grep(state, state.abb)]` patrol officers who desire additional training in the following topics:
+\newpage
 
-- Identifying and responding to opioid overdoses:
+## Training
+
+### Percentage of `r state.name[grep(state, state.abb)]` patrol officers who desire additional training in the following topics:
+
+#### Identifying and responding to opioid overdoses:
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = n(), Training = sum(add_training_identify_and_respon>0, na.rm=TRUE), Percent = (Training/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Training','Percent'))
 ```
 
-- The safe handling of opioids and other illicit substances in the field:
+#### The safe handling of opioids and other illicit substances in the field:
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = n(), Training = sum(add_training_safe_handling>0, na.rm=TRUE), Percent = (Training/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Training','Percent'))
 ```
 
-- The clinical science and psychology of opioid use disorder (addiction):
+#### The clinical science and psychology of opioid use disorder (addiction):
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = n(), Training = sum(add_training_science_of_addictio>0, na.rm=TRUE), Percent = (Training/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Training','Percent'))
 ```
 
-- Provisions and procedures related to `r state.name[grep(state, state.abb)]` 911 Good Samaritan Law:
+#### Provisions and procedures related to `r state.name[grep(state, state.abb)]` 911 Good Samaritan Law:
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = n(), Training = sum(add_training_procedures_of_gsl>0, na.rm=TRUE), Percent = (Training/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Training','Percent'))
 ```
 
-- Medical, social, and psychological services available in `r state.name[grep(state, state.abb)]` for people experiencing opioid use disorder (addiction) and their families:
+#### Medical, social, and psychological services available in `r state.name[grep(state, state.abb)]` for people experiencing opioid use disorder (addiction) and their families:
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = n(), Training = sum(add_training_services_available>0, na.rm=TRUE), Percent = (Training/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Training','Percent'))
 ```
 
-- Training already received is satisfactory:
+#### Training already received is satisfactory:
 
->**[Insert % of officers who chose this training topic, by jurisdiction]**
+```{r echo=FALSE}
+kable(summarise(jurisdiction, Officers = n(), Training = sum(add_training_na>0, na.rm=TRUE), Percent = (Training/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Training','Percent'))
+```
 
-Other training topics suggested:
+#### Other training topics suggested:
 
->[Insert bullet list of additional  suggestions from the &quot;Other&quot; text box on the survey]
+- `r data$add_training_other_specify[data$add_training_other_specify!='']`
 
->[STATE]
+\newpage
 
-These agencies should be involved in post-overdose outreach efforts to connect the overdose victim with treatment and other services.
+## Agencies
 
->[Insert visual depiction of which groups officers elected to be appropriate for post-overdose outreach. Do not break out by jurisdiction.  There&#39;s no right way to do this, the only concern is that any color coding across various bar charts or stratification needs to be consistent across the document (i.e. County police are always blue. YES responses are always yellow, etc)]
+### These agencies should be involved in post-overdose outreach efforts to connect the overdose victim with treatment and other services.
 
->[STATE]
+- Law Enforcement: `r sum(data$agencies_law_enforcement)` out of `r sum(data$agencies_law_enforcement!='NA')` officers (`r round(sum(data$agencies_law_enforcement)/sum(data$agencies_law_enforcement!='NA')*100,2)`%) answered 'Yes'
+- Local Hospitals: `r sum(data$agencies_local_hospitals)` out of `r sum(data$agencies_local_hospitals!='NA')` officers (`r round(sum(data$agencies_local_hospitals)/sum(data$agencies_local_hospitals!='NA')*100,2)`%) answered 'Yes'
+- Fire Departments: `r sum(data$agencies_fire_departments)` out of `r sum(data$agencies_fire_departments!='NA')` officers (`r round(sum(data$agencies_fire_departments)/sum(data$agencies_fire_departments!='NA')*100,2)`%) answered 'Yes'
+- EMS: `r sum(data$agencies_ems)` out of `r sum(data$agencies_ems!='NA')` officers (`r round(sum(data$agencies_ems)/sum(data$agencies_ems!='NA')*100,2)`%) answered 'Yes'
+- Public Health Agencies: `r sum(data$agencies_public_health)` out of `r sum(data$agencies_public_health!='NA')` officers (`r round(sum(data$agencies_public_health)/sum(data$agencies_public_health!='NA')*100,2)`%) answered 'Yes'
+
+## Attitudes
 
 >[Show, through numbers or visuals, the percent of officers who AGREED with the following statements. Do not break out by jurisdiction]
 
@@ -183,13 +207,23 @@ Opioid Misuse and Opioid Use Disorder
 - Opioid misuse is a disease that should be dealt with through treatment and support services.
 - Arrest can play an important role in helping drug users change their behavior.
 
->[STATE]
+\newpage
 
-Personal Connection to the Opioid Epidemic
+## Personal Connection to the Opioid Epidemic
 
->[Insert visual that shows the percentage of officers who know someone who has lived with a substance use disorder AND the percentage of officers who know someone who has experienced an overdose. Break out by jurisdiction]
+### What percentage of officers know someone who has lived with a substance use disorder?
 
+```{r echo=FALSE}
+kable(summarise(jurisdiction, Officers = n(), Know = sum(know_add), Percent = (Know/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Know Someone','Percent'))
 
+```
+
+### What percentage of officers know someone who has experienced an overdose?
+
+```{r echo=FALSE}
+kable(summarise(jurisdiction, Officers = n(), Know = sum(know_od), Percent = (Know/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Know Someone','Percent'))
+
+```
 
 Other blurbs will go here to describe what these data correlate with, if anything JENNIFER WILL UPDATE STATE BY STATE:
 
@@ -199,8 +233,7 @@ Other blurbs will go here to describe what these data correlate with, if anythin
 
 >[STATE]
 
-A total of 2869 patrol officers from 20 states participated in this survey.
-`r nrow(data)` (`r round((nrow(data)/2869)*100,2)`%) of those officers serve in `r state.name[grep(state, state.abb)]`.
+Of the 2869 patrol officers from 20 states that participated in this survey `r nrow(data)` (`r round((nrow(data)/2869)*100,2)`%) serve in `r state.name[grep(state, state.abb)]`.
 
 >Insert here descriptive stats and/or visuals for the following [N(%)]
 
