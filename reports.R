@@ -5,7 +5,7 @@ library(rmarkdown)
 survey = read.csv('data.csv')
 
 #comment out line below to generate all reports
-survey <- survey[ which(survey$state=='GA' ), ]
+#survey <- survey[ which(survey$state=='GA' ), ]
 
 for (state in unique(survey$state)){
   print(paste("Compiling report for", state))
