@@ -3,8 +3,10 @@ title: "HIDA State Report"
 author: "Centers for Disease Control and Prevention"
 date: "February 5, 2018"
 output:
-  word_document: default
+  html_document:
+    df_print: paged
   pdf_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -15,10 +17,10 @@ library(ggplot2)
 knitr::opts_chunk$set(echo = TRUE)
 if (!exists("survey")) { 
      survey = read.csv('data.csv')
-     state <- 'GA'
+     state <- 'KY'
      data <- survey[ which(survey$state==state ), ]
 }
-jurisdiction <- group_by(data, jurisdiction)
+jurisdiction <- group_by(data[ which(data$jurisdiction!=''),], jurisdiction)
 ```
 
 # State Report for `r state.name[grep(state, state.abb)]`
@@ -29,6 +31,16 @@ jurisdiction <- group_by(data, jurisdiction)
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = n(), Trained = sum(add_training_identify_and_respon), Percent = (sum(add_training_identify_and_respon) / n())*100), digits=2, col.names = c('Jurisdiction','Officers','Trained','Percent'))
+
+```
+
+```{r echo=FALSE}
+#Convert data wide to long
+mdata <- melt(jurisdiction, id=c('response_id','jurisdiction'))
+
+#Plot of question responses
+ggplot(subset(mdata, (variable == 'num_overdose_calls' | variable == 'num_naloxone_administer') & !is.na(value) & jurisdiction != ''), aes(variable, value)) +
+  geom_bar(aes(fill = jurisdiction), position = "dodge", stat="identity")
 
 ```
 
