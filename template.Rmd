@@ -3,9 +3,9 @@ title: "HIDA State Report"
 author: "Centers for Disease Control and Prevention"
 date: "February 5, 2018"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
   word_document: default
 ---
 
@@ -14,12 +14,14 @@ library(knitr)
 library(dplyr)
 library(reshape2)
 library(ggplot2)
+library(scales)
 knitr::opts_chunk$set(echo = TRUE)
 if (!exists("survey")) { 
      survey = read.csv('data.csv')
      state <- 'KY'
      data <- survey[ which(survey$state==state ), ]
 }
+data$jurisdiction <- sub("^$", "None Specified", data$jurisdiction)
 jurisdiction <- group_by(data[ which(data$jurisdiction!=''),], jurisdiction)
 ```
 
@@ -31,16 +33,6 @@ jurisdiction <- group_by(data[ which(data$jurisdiction!=''),], jurisdiction)
 
 ```{r echo=FALSE}
 kable(summarise(jurisdiction, Officers = n(), Trained = sum(add_training_identify_and_respon), Percent = (sum(add_training_identify_and_respon) / n())*100), digits=2, col.names = c('Jurisdiction','Officers','Trained','Percent'))
-
-```
-
-```{r echo=FALSE}
-#Convert data wide to long
-mdata <- melt(jurisdiction, id=c('response_id','jurisdiction'))
-
-#Plot of question responses
-ggplot(subset(mdata, (variable == 'num_overdose_calls' | variable == 'num_naloxone_administer') & !is.na(value) & jurisdiction != ''), aes(variable, value)) +
-  geom_bar(aes(fill = jurisdiction), position = "dodge", stat="identity")
 
 ```
 
@@ -108,6 +100,21 @@ qplot(graphdata) +
 
 ##Knowledge
 
+```{r echo=FALSE}
+myvars <- c('gsl_na',	'gsl_arrest',	'gsl_charge')
+graph <- filter(jurisdiction,n() > 4)
+graph <- aggregate(graph[myvars], list(graph$jurisdiction), mean, na.rm = TRUE)
+graph <- melt(graph,id.vars="Group.1")
+
+ggplot(graph, aes(variable, value)) +
+  geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
+  ylab("Percent of Officers that Answered Correctly") +
+  labs(title = "Knowledge of GSL by Jurisdiction", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
+  scale_y_continuous(labels = percent_format(), limits = c(0,1)) +
+  scale_x_discrete(name = "Question", labels=c("Does your state have a GSL in effect?","Does your state's GSL protect against arrest?","Does your state's GSL protect against charges?")) +
+  coord_flip()
+```
+
 ### Does `r state.name[grep(state, state.abb)]` have a 911 Good Samaritan Law in effect?
 
 ```{r echo=FALSE}
@@ -129,6 +136,21 @@ kable(summarise(jurisdiction, Officers = n(), Correct = sum(gsl_charge>0, na.rm=
 \newpage
 
 ## Training
+
+```{r echo=FALSE}
+myvars <- c('add_training_identify_and_respon',	'add_training_safe_handling',	'add_training_science_of_addictio',	'add_training_txt_addiction',	'add_training_procedures_of_gsl',	'add_training_services_available')
+graph <- filter(jurisdiction,n() > 4)
+graph <- aggregate(graph[myvars], list(graph$jurisdiction), mean, na.rm = TRUE)
+graph <- melt(graph,id.vars="Group.1")
+
+ggplot(graph, aes(variable, value)) +
+  geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
+  ylab("Percent of Officers that Want Training") +
+  labs(title = "Training Needs by Jurisdiction", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
+  scale_y_continuous(labels = percent_format(), limits = c(0,1)) +
+  scale_x_discrete(name = "Type of Training", labels=c("Identify and Respond to OD","Safe Handling of Opioids or Substances","Science of Addiction","Treatments for Addiction","State GSL Procedures","Treatment Services Available")) +
+  coord_flip()
+```
 
 ### Percentage of `r state.name[grep(state, state.abb)]` patrol officers who desire additional training in the following topics:
 
