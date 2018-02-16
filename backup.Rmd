@@ -35,20 +35,38 @@ The **`r nrow(data)`** officers that responded to this survey reported a total o
 
 **`r sum(data$num_naloxone_administer>0, na.rm=TRUE)`** officers in `r state.name[grep(state, state.abb)]` reported having reversed an overdose with naloxone in the past six months, accounting for **`r round(sum(data$num_naloxone_administer>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers. There were a total of **`r sum(data$num_naloxone_administer, na.rm=TRUE)`** overdose reversals reported, with each of the **`r sum(data$num_naloxone_administer>0, na.rm=TRUE)`** officers that reported reversing an overdose reporting **`r round(sum(data$num_naloxone_administer, na.rm=TRUE)/sum(data$num_naloxone_administer>0, na.rm=TRUE),2)`**
 
-```{r echo=FALSE, fig.height=3.5, fig.width=8}
-myvars <- c('num_overdose_calls',	'narcan_carry',	'num_naloxone_administer')
-graph <- filter(jurisdiction,n() > 4)
-graph <- aggregate(graph[myvars], list(graph$jurisdiction), sum, na.rm = TRUE)
-graph <- melt(graph,id.vars="Group.1")
-graphlabels <- c("Responded to an overdose","Department equipped to carry narcan","Reversed an overdose in last six months")
+\newpage
 
-ggplot(graph, aes(variable, value)) +
-  geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
-  ylab("Number of Officers") +
-  labs(title = "Rates by Jurisdiction", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
-  scale_x_discrete(name = "Rates", labels = str_wrap(graphlabels, width = 15)) +
-  coord_flip() +
-  scale_fill_grey()
+```{r echo=FALSE}
+kable(summarise(jurisdiction, Officers = n(), Trained = sum(add_training_identify_and_respon), Percent = (sum(add_training_identify_and_respon) / n())*100), digits=2, col.names = c('Jurisdiction','Officers','Trained','Percent'))
+
+```
+
+### What percentage of officers work in departments that equip some or all officers to carry naloxone (this may not mean that every officer is equipped with naloxone)?
+
+```{r echo=FALSE}
+kable(summarise(jurisdiction, Officers = n(), Naloxone = sum(narcan_carry), Percent = (sum(narcan_carry) / n())*100), digits=2, col.names = c('Jurisdiction','Officers','Naloxone','Percent'))
+
+```
+
+### How many overdose calls have officers responded to in the past 6 months?
+
+```{r echo=FALSE}
+if(mean(data$num_overdose_calls, na.rm=TRUE)>1){
+kable(summarise(jurisdiction, Officers = n(), Total = sum(num_overdose_calls, na.rm=TRUE), Average = mean(num_overdose_calls, na.rm=TRUE)), digits=2, col.names = c('Jurisdiction','Officers','Calls','Average Per Officer'))
+}else{
+kable(summarise(jurisdiction, Officers = n(), Total = sum(num_overdose_calls, na.rm=TRUE), Percent = (sum(num_overdose_calls>0, na.rm=TRUE)/n())*100), digits=2, col.names = c('Jurisdiction','Officers','Calls','% That Answered'))
+}
+```
+
+### How many overdoses have officers  reversed with naloxone in the past 6 months ?
+
+```{r echo=FALSE}
+if(mean(data$num_naloxone_administer, na.rm=TRUE)>1){
+kable(summarise(jurisdiction, Officers = n(), Total = sum(num_naloxone_administer, na.rm=TRUE), Average = mean(num_naloxone_administer, na.rm=TRUE)), digits=2, col.names = c('Jurisdiction','Officers','Reversals','Average Per Officer'))
+}else{
+kable(summarise(jurisdiction, Officers = n(), Total = sum(num_naloxone_administer, na.rm=TRUE), Percent = (sum(num_naloxone_administer>0, na.rm=TRUE)/n())*100), digits=2, col.names = c('Jurisdiction','Officers','Reversals','% That Reversed'))
+}
 ```
 
 \newpage
