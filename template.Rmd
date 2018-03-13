@@ -1,9 +1,8 @@
 ---
-title: "HIDA State Report"
-date: "February 5, 2018"
+title: "Preliminary State Report"
 output:
-  word_document: default
   pdf_document: default
+  word_document: default
   html_document:
     df_print: paged
 ---
@@ -31,69 +30,85 @@ Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` tha
 
 The **`r nrow(data)`** officers that responded to this survey reported a total of **`r sum(data$num_overdose_calls, na.rm=TRUE)`** overdose calls within the past six months, with each of the **`r sum(data$num_overdose_calls>0, na.rm=TRUE)`** officers that responded to a call reporting an average of **`r round(sum(data$num_overdose_calls, na.rm=TRUE)/sum(data$num_overdose_calls>0, na.rm=TRUE),2)`** calls per officer.
 
+```{r echo=FALSE, fig.height=1.5, fig.width=8}
+myvars <- c('num_overdose_calls')
+graph <- filter(jurisdiction,n() > 4)
+graph <- aggregate(graph[myvars], list(graph$jurisdiction), sum, na.rm = TRUE)
+graph <- melt(graph,id.vars="Group.1")
+graphlabels <- c("How many overdose calls have you responded to?")
+
+ggplot(graph, aes(variable, value)) +
+  geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
+  ylab("Number of Calls in last 6 months") +
+  labs(title = "Number of Calls by Jurisdiction", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
+  scale_x_discrete(name = "Question", labels = str_wrap(graphlabels, width = 15)) +
+  coord_flip() +
+  scale_fill_grey()
+```
+
 **`r sum(data$narcan_carry>0, na.rm=TRUE)`** officers reported working in departments that equip some or all officers to carry naloxone (this may not mean that every officer is equipped with naloxone). This accounted for **`r round(sum(data$narcan_carry>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
 
 **`r sum(data$num_naloxone_administer>0, na.rm=TRUE)`** officers in `r state.name[grep(state, state.abb)]` reported having reversed an overdose with naloxone in the past six months, accounting for **`r round(sum(data$num_naloxone_administer>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers. There were a total of **`r sum(data$num_naloxone_administer, na.rm=TRUE)`** overdose reversals reported, with each of the **`r sum(data$num_naloxone_administer>0, na.rm=TRUE)`** officers that reported reversing an overdose reporting **`r round(sum(data$num_naloxone_administer, na.rm=TRUE)/sum(data$num_naloxone_administer>0, na.rm=TRUE),2)`** reversals per officer.
 
-```{r echo=FALSE, fig.height=3.5, fig.width=8}
-myvars <- c('num_overdose_calls',	'narcan_carry',	'num_naloxone_administer')
+```{r echo=FALSE, fig.height=2.5, fig.width=8}
+myvars <- c('num_naloxone_administer', 'narcan_carry')
 graph <- filter(jurisdiction,n() > 4)
 graph <- aggregate(graph[myvars], list(graph$jurisdiction), sum, na.rm = TRUE)
 graph <- melt(graph,id.vars="Group.1")
-graphlabels <- c("Responded to an overdose","Department equipped to carry narcan","Reversed an overdose in last six months")
+graphlabels <- c("Number of overdoses reversed in last six months","Department equipped to carry narcan")
 
 ggplot(graph, aes(variable, value)) +
   geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
-  ylab("Number of Officers") +
+  ylab("Reported Rates") +
   labs(title = "Rates by Jurisdiction", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
-  scale_x_discrete(name = "Rates", labels = str_wrap(graphlabels, width = 15)) +
+  scale_x_discrete(name = "Question", labels = str_wrap(graphlabels, width = 15)) +
   coord_flip() +
   scale_fill_grey()
 ```
 
 \newpage
 
-## Responses from `r sum(data$num_overdose_calls>0, na.rm=TRUE)` officers who reported having responded to at least one overdose call in the past 6 months
+## Officers that responded to overdose calls
 
-### How commonly are victims of an overdose arrested during the overdose call?
+The following are results from the **`r sum(data$num_overdose_calls>0, na.rm=TRUE)`** officers in `r state.name[grep(state, state.abb)]` that responded to at least one overdose call in the past 6 months.
 
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = sum(num_overdose_calls>0, na.rm=TRUE), Calls = sum(num_overdose_calls, na.rm=TRUE), Arrests = sum(od_arrest, na.rm=TRUE), Percent = (Arrests/Calls)*100), digits=2, col.names = c('Jurisdiction','Officers','Calls','Arrests','% Arrested'))
-```
+Of the **`r sum(data$num_overdose_calls, na.rm=TRUE)`** overdose calls responded to in the past 6 months by **`r sum(data$num_overdose_calls>0, na.rm=TRUE)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$od_arrest, na.rm=TRUE)`** of those calls resulted in the victim of an overdose being arrested. This accounted for **`r round(sum(data$od_arrest>0, na.rm=TRUE)/sum(data$num_overdose_calls, na.rm=TRUE)*100,2)`%** of all calls. 
 
-### How commonly are witnesses to an overdose arrested during the overdose call?
+Of the **`r sum(data$num_overdose_calls, na.rm=TRUE)`** overdose calls in the past 6 months in `r state.name[grep(state, state.abb)]`, **`r sum(data$overdose_witness_arrest, na.rm=TRUE)`** of those calls resulted in a witness to an overdose being arrested. This accounted for **`r round(sum(data$overdose_witness_arrest>0, na.rm=TRUE)/sum(data$num_overdose_calls, na.rm=TRUE)*100,2)`%** of all calls. 
 
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = sum(num_overdose_calls>0, na.rm=TRUE), Calls = sum(num_overdose_calls, na.rm=TRUE), Arrests = sum(overdose_witness_arrest,na.rm=TRUE), Percent = (Arrests/Calls)*100), digits=2, col.names = c('Jurisdiction','Officers','Calls','Arrests','% Arrested'))
-```
+```{r echo=FALSE, fig.height=2.5, fig.width=8}
+myvars <- c('overdose_witness_arrest','od_arrest')
+graph <- filter(jurisdiction,n() > 4)
+graph <- aggregate(graph[myvars], list(graph$jurisdiction), sum, na.rm = TRUE)
+graph <- melt(graph,id.vars="Group.1")
+graphlabels <- c("How many witnesses to an overdose were arrested?","How many overdose victims were arrested?")
 
-\newpage
-
-##Attitudes
-
-### How would you describe the attitude of officers in your department about carrying and administering naloxone?
-
->**Need visualization feedback before dividing by Jurisdiction - Bradley**
-
-```{r echo=FALSE, message=FALSE}
-library(ggplot2)
-graphdata = recode(data$attitude_of_naloxone, 'Overwhelmingly negative'=1,'Generally negative'=2,'Mixed'=3,'Generally positive'=4,'Overwhelmingly positive'=5)
-qplot(graphdata) + 
-  geom_bar() +
-  scale_x_continuous(breaks = 1:5, labels=c('Overwhelmingly negative','Generally negative','Mixed','Generally positive','Overwhelmingly positive')) +
-  coord_flip()
+ggplot(graph, aes(variable, value)) +
+  geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
+  ylab("Number of Arrests") +
+  labs(title = "Number of Arrests Resulting from Overdose Calls", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
+  scale_x_discrete(name = "Question", labels = str_wrap(graphlabels, width = 15)) +
+  coord_flip() +
+  scale_fill_grey()
 ```
 
 \newpage
 
 ##Knowledge
 
+Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$gsl_na, na.rm=TRUE)`** responded correctly when asked whether `r state.name[grep(state, state.abb)]` has a 911 Good Samaritan Law in effect. This accounted for **`r round(sum(data$gsl_na>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
+
+**`r sum(data$gsl_arrest, na.rm=TRUE)`** of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` responded correctly when asked whether `r state.name[grep(state, state.abb)]` provides immunity from arrest. This accounted for **`r round(sum(data$gsl_arrest>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers.
+
+**`r sum(data$gsl_charge, na.rm=TRUE)`** officers responded correctly when asked whether `r state.name[grep(state, state.abb)]` provides immunity from criminal charges. This accounted for **`r round(sum(data$gsl_charge>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
+
+
 ```{r echo=FALSE, fig.height=3.5, fig.width=8}
-myvars <- c('gsl_na',	'gsl_arrest',	'gsl_charge')
+myvars <- c('gsl_charge',	'gsl_arrest',	'gsl_na')
 graph <- filter(jurisdiction,n() > 4)
 graph <- aggregate(graph[myvars], list(graph$jurisdiction), mean, na.rm = TRUE)
 graph <- melt(graph,id.vars="Group.1")
-graphlabels <- c("Does your state have a GSL in effect?","Does your state's GSL protect against arrest?","Does your state's GSL protect against charges?")
+graphlabels <- c("Does your state's GSL protect against charges?","Does your state's GSL protect against arrest?","Does your state have a GSL in effect?")
 
 ggplot(graph, aes(variable, value)) +
   geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
@@ -103,24 +118,6 @@ ggplot(graph, aes(variable, value)) +
   scale_x_discrete(name = "Question", labels = str_wrap(graphlabels, width = 15)) +
   coord_flip() +
   scale_fill_grey()
-```
-
-### Does `r state.name[grep(state, state.abb)]` have a 911 Good Samaritan Law in effect?
-
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = n(), Correct = sum(gsl_na>0, na.rm=TRUE), Percent = (Correct/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Correct','% Correct'))
-```
-
-### Does `r state.name[grep(state, state.abb)]` provide immunity from arrest?
-
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = n(), Correct = sum(gsl_arrest>0, na.rm=TRUE), Percent = (Correct/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Correct','% Correct'))
-```
-
-### Does `r state.name[grep(state, state.abb)]` provide immunity from  criminal charges?
-
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = n(), Correct = sum(gsl_charge>0, na.rm=TRUE), Percent = (Correct/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Correct','% Correct'))
 ```
 
 \newpage
@@ -144,127 +141,114 @@ ggplot(graph, aes(variable, value)) +
   scale_fill_grey()
 ```
 
-### Percentage of `r state.name[grep(state, state.abb)]` patrol officers who desire additional training in the following topics:
+Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$add_training_identify_and_respon>0, na.rm=TRUE)`** stated that they would like additional training in **Identifying and responding to opioid overdoses**. This accounted for **`r round(sum(data$add_training_identify_and_respon>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
 
-#### Identifying and responding to opioid overdoses:
+**`r sum(data$add_training_safe_handling>0, na.rm=TRUE)`** officers (**`r round(sum(data$add_training_safe_handling>0, na.rm=TRUE)/nrow(data)*100,2)`%**) reported they would like additional training in **The safe handling of opioids and other illicit substances in the field**.
 
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = n(), Training = sum(add_training_identify_and_respon>0, na.rm=TRUE), Percent = (Training/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Training','Percent'))
-```
+**`r sum(data$add_training_science_of_addictio>0, na.rm=TRUE)`** officers (**`r round(sum(data$add_training_science_of_addictio>0, na.rm=TRUE)/nrow(data)*100,2)`%**) reported they would like training in **The clinical science and psychology of opioid use disorder (addiction)**.
 
-#### The safe handling of opioids and other illicit substances in the field:
+**`r sum(data$add_training_procedures_of_gsl>0, na.rm=TRUE)`** officers (**`r round(sum(data$add_training_procedures_of_gsl>0, na.rm=TRUE)/nrow(data)*100,2)`%**) reported they would like training in **Provisions and procedures related to `r state.name[grep(state, state.abb)]` 911 Good Samaritan Law**.
 
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = n(), Training = sum(add_training_safe_handling>0, na.rm=TRUE), Percent = (Training/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Training','Percent'))
-```
+**`r sum(data$add_training_services_available>0, na.rm=TRUE)`** officers (**`r round(sum(data$add_training_services_available>0, na.rm=TRUE)/nrow(data)*100,2)`%**) reported they would like training in **Medical, social, and psychological services available in `r state.name[grep(state, state.abb)]` for people experiencing opioid use disorder (addiction) and their families**.
 
-#### The clinical science and psychology of opioid use disorder (addiction):
+Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$add_training_na>0, na.rm=TRUE)`** reported that the **Training already received is satisfactory**. This accounted for **`r round(sum(data$add_training_na>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
 
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = n(), Training = sum(add_training_science_of_addictio>0, na.rm=TRUE), Percent = (Training/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Training','Percent'))
-```
+### Other training topics suggested
 
-#### Provisions and procedures related to `r state.name[grep(state, state.abb)]` 911 Good Samaritan Law:
-
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = n(), Training = sum(add_training_procedures_of_gsl>0, na.rm=TRUE), Percent = (Training/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Training','Percent'))
-```
-
-#### Medical, social, and psychological services available in `r state.name[grep(state, state.abb)]` for people experiencing opioid use disorder (addiction) and their families:
-
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = n(), Training = sum(add_training_services_available>0, na.rm=TRUE), Percent = (Training/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Training','Percent'))
-```
-
-#### Training already received is satisfactory:
-
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = n(), Training = sum(add_training_na>0, na.rm=TRUE), Percent = (Training/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Training','Percent'))
-```
-
-#### Other training topics suggested:
+Officers in `r state.name[grep(state, state.abb)]` provided the following qualitative feedback regarding recommended trainings in `r state.name[grep(state, state.abb)]`:
 
 - `r data$add_training_other_specify[data$add_training_other_specify!='']`
 
 \newpage
 
-## Agencies
+##Attitudes
 
-### These agencies should be involved in post-overdose outreach efforts to connect the overdose victim with treatment and other services.
+The following graph depicts how officers reported the attitude of officers in their department about carrying and administering naloxone:
 
-- Law Enforcement: `r sum(data$agencies_law_enforcement)` out of `r sum(data$agencies_law_enforcement!='NA')` officers (`r round(sum(data$agencies_law_enforcement)/sum(data$agencies_law_enforcement!='NA')*100,2)`%) answered 'Yes'
-- Local Hospitals: `r sum(data$agencies_local_hospitals)` out of `r sum(data$agencies_local_hospitals!='NA')` officers (`r round(sum(data$agencies_local_hospitals)/sum(data$agencies_local_hospitals!='NA')*100,2)`%) answered 'Yes'
-- Fire Departments: `r sum(data$agencies_fire_departments)` out of `r sum(data$agencies_fire_departments!='NA')` officers (`r round(sum(data$agencies_fire_departments)/sum(data$agencies_fire_departments!='NA')*100,2)`%) answered 'Yes'
-- EMS: `r sum(data$agencies_ems)` out of `r sum(data$agencies_ems!='NA')` officers (`r round(sum(data$agencies_ems)/sum(data$agencies_ems!='NA')*100,2)`%) answered 'Yes'
-- Public Health Agencies: `r sum(data$agencies_public_health)` out of `r sum(data$agencies_public_health!='NA')` officers (`r round(sum(data$agencies_public_health)/sum(data$agencies_public_health!='NA')*100,2)`%) answered 'Yes'
+```{r echo=FALSE, message=FALSE}
+library(ggplot2)
+graphdata = recode(data$attitude_of_naloxone, 'Overwhelmingly negative'=1,'Generally negative'=2,'Mixed'=3,'Generally positive'=4,'Overwhelmingly positive'=5)
+qplot(graphdata) + 
+  geom_bar() +
+  scale_x_continuous(name = 'Attitude of Department', breaks = 1:5, labels=c('Overwhelmingly negative','Generally negative','Mixed','Generally positive','Overwhelmingly positive')) +
+  ylab("Number of Ratings") +
+  labs(title = "Attitude Toward Naloxone") +
+  coord_flip() +
+  scale_fill_grey()
+```
 
-## Attitudes
+The following reflect how many of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` AGREED with the following statements:
 
->[Show, through numbers or visuals, the percent of officers who AGREED with the following statements. Do not break out by jurisdiction]
+###911 Good Samaritan Laws
 
-911 Good Samaritan Laws
+- A 911 Good Samaritan Law increases the number of 911 calls by people who witness an overdose (**`r sum(data$cleaned_gsl_increases_od_calls>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_gsl_increases_od_calls>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
+- 911 Good Samaritan Laws may encourage more opioid use by sending the message that drug use is OK (**`r sum(data$cleaned_gsl_encourage_use>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_gsl_encourage_use>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
+- 911 Good Samaritan Laws save lives (**`r sum(data$cleaned_gsl_saves>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_gsl_saves>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
 
-- A 911 Good Samaritan Law increases the number of 911 calls by people who witness an overdose.
-- 911 Good Samaritan Laws may encourage more opioid use by sending the message that drug use is OK.
-- 911 Good Samaritan Laws save lives
+###Overdose Response Procedures and Protocols
 
-Overdose Response Procedures and Protocols
+- It is important for police officers to be present at the scene of an overdose to protect medical personnel (**`r sum(data$cleaned_police_protect_medical>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_police_protect_medical>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
+- It is important for police officers to be present at the scene of an overdose, because they may be the first responder to arrive on the scene with Naloxone and save a life (**`r sum(data$cleaned_police_first_responder>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_police_first_responder>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
+- It is important for police officers to be present at the scene of an overdose to enforce the law (**`r sum(data$cleaned_police_enforce_law>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_police_enforce_law>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
 
-- It is important for police officers to be present at the scene of an overdose to protect medical personnel.
-- It is important for police officers to be present at the scene of an overdose, because they may be the first responder to arrive on the scene with Naloxone and save a life.
-- It is important for police officers to be present at the scene of an overdose to enforce the law.
+###Naloxone Training, Carry, and Distribution
 
-Naloxone Training, Carry, and Distribution
+- I am worried about the liability of officers who carry and/or administer naloxone (**`r sum(data$cleaned_worried_liability>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_worried_liability>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
+- Programs to train and distribute naloxone to lay community members to treat overdose save lives (**`r sum(data$cleaned_naloxone_training_saves>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_naloxone_training_saves>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
+- Programs to train and distribute naloxone to lay community members may encourage opioid use by sending the message that drug use is OK (**`r sum(data$cleaned_naloxone_encourage_use>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_naloxone_encourage_use>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
+- Training community members how to identify and respond to an overdose may encourage opioid drug use by sending the message that drug use is OK (**`r sum(data$cleaned_training_encourage_use>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_training_encourage_use>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
 
-- I am worried about the liability of officers who carry and/or administer naloxone.
-- Programs to train and distribute naloxone to lay community members to treat overdose save lives.
-- Programs to train and distribute naloxone to lay community members may encourage opioid use by sending the message that drug use is OK.
-- Training community members how to identify and respond to an overdose may encourage opioid drug use by sending the message that drug use is OK.
+###Fentanyl in the Drug Supply
 
->[STATE]
+- I am worried about myself and other first responders who are called to assist persons suffering overdose, because there is so much fentanyl in the drug supply (**`r sum(data$cleaned_worried_for_self_fenta>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_worried_for_self_fenta>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
+- I am worried about people who use drugs, because there is so much fentanyl in the drug supply (**`r sum(data$cleaned_worried_for_people_fenta>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_worried_for_people_fenta>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
 
-Fentanyl in the Drug Supply
+###Opioid Misuse and Opioid Use Disorder
 
-- I am worried about myself and other first responders who are called to assist persons suffering overdose, because there is so much fentanyl in the drug supply.
-- I am worried about people who use drugs, because there is so much fentanyl in the drug supply.
-
-Opioid Misuse and Opioid Use Disorder
-
-- Opioid misuse is a disease that should be dealt with through treatment and support services.
-- Arrest can play an important role in helping drug users change their behavior.
+- Opioid misuse is a disease that should be dealt with through treatment and support services (**`r sum(data$cleaned_opioid_is_disease>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_opioid_is_disease>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
+- Arrest can play an important role in helping drug users change their behavior (**`r sum(data$cleaned_arrest_changes_behavior>=3, na.rm=TRUE)`**; **`r round(sum(data$cleaned_arrest_changes_behavior>=3, na.rm=TRUE)/nrow(data)*100,2)`%** agree)
 
 \newpage
 
-## Personal Connection to the Opioid Epidemic
+## Agencies
 
-### What percentage of officers know someone who has lived with a substance use disorder?
+Officers in `r state.name[grep(state, state.abb)]` provided the following feedback regarding what agencies should be involved in post-overdose outreach efforts to connect the overdose victim with treatment and other services:
 
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = n(), Know = sum(know_add), Percent = (Know/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Know Someone','Percent'))
+- Law Enforcement: **`r sum(data$agencies_law_enforcement)`** out of **`r sum(data$agencies_law_enforcement!='NA')`** officers (**`r round(sum(data$agencies_law_enforcement)/sum(data$agencies_law_enforcement!='NA')*100,2)`%**) reported that **Law Enforcement** should be involved.
+- Local Hospitals: **`r sum(data$agencies_local_hospitals)`** out of **`r sum(data$agencies_local_hospitals!='NA')`** officers (**`r round(sum(data$agencies_local_hospitals)/sum(data$agencies_local_hospitals!='NA')*100,2)`%**) believe **Local Hospitals** should be involved.
+- Fire Departments: **`r sum(data$agencies_fire_departments)`** out of **`r sum(data$agencies_fire_departments!='NA')`** officers (**`r round(sum(data$agencies_fire_departments)/sum(data$agencies_fire_departments!='NA')*100,2)`%**) believe **Fire Departments** should be involved.
+- EMS: **`r sum(data$agencies_ems)`** out of **`r sum(data$agencies_ems!='NA')`** officers (**`r round(sum(data$agencies_ems)/sum(data$agencies_ems!='NA')*100,2)`%**) believe that **EMS** should be involved.
+- Public Health Agencies: **`r sum(data$agencies_public_health)`** out of **`r sum(data$agencies_public_health!='NA')`** officers (**`r round(sum(data$agencies_public_health)/sum(data$agencies_public_health!='NA')*100,2)`%**) reported that **Public Health Agencies** should be involved.
 
-```
+\newpage
 
-### What percentage of officers know someone who has experienced an overdose?
-
-```{r echo=FALSE}
-kable(summarise(jurisdiction, Officers = n(), Know = sum(know_od), Percent = (Know/Officers)*100), digits=2, col.names = c('Jurisdiction','Officers','Know Someone','Percent'))
-
-```
-
-Other blurbs will go here to describe what these data correlate with, if anything JENNIFER WILL UPDATE STATE BY STATE:
-
-- Example 1
-- Example 2
-- Example 3
-
->[STATE]
+## Demographics
 
 Of the 2869 patrol officers from 20 states that participated in this survey `r nrow(data)` (`r round((nrow(data)/2869)*100,2)`%) serve in `r state.name[grep(state, state.abb)]`.
 
->Insert here descriptive stats and/or visuals for the following [N(%)]
+- Of the **`r nrow(data)`** officers from `r state.name[grep(state, state.abb)]`, **`r sum(data$female<1, na.rm=TRUE)`** reported their gender as male (**`r round(sum(data$female<1, na.rm=TRUE)/nrow(data)*100,2)`%**) and **`r sum(data$female>0, na.rm=TRUE)`** (**`r round(sum(data$female>0, na.rm=TRUE)/nrow(data)*100,2)`%**) reported their gender as female. The remaining officers did not report their gender.
+- The **`r nrow(data)`** officers from `r state.name[grep(state, state.abb)]` reported an average of **`r round(mean(data$years_work, na.rm=TRUE), 1)`** years on the force, with responses ranging from **`r min(data$years_work, na.rm=TRUE)`** to **`r max(data$years_work, na.rm=TRUE)`** years.
 
-- Jurisdiction of respondents (State, county, city, town, village)
-- Reported size of the respondents&#39; department (&lt;9, 10-19, 20-49, 50-99, 100-499, &gt;500)
-- Number of years on the force (we&#39;ll give this to you as a continuous variable and as a categorical variable with pre-set cut points)
-- Age
-- Gender (Participants were REALLY touchy about age and gender. Many can only imagine nefarious ways to use this information. So, depending  on how we can show this, we might decide to just cut out the presentation of these variables in the front matter (the section with the pretty pictures))
+\newpage
+
+### Personal Connection to the Opioid Epidemic
+
+**`r sum(data$know_add, na.rm=TRUE)`** out of **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` reported that they personally know someone who has lived with a substance use disorder. This constitutes **`r round(sum(data$know_add, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
+
+**`r sum(data$know_od, na.rm=TRUE)`** officers in `r state.name[grep(state, state.abb)]` reported that they know someone who has experienced an overdose. This constitutes **`r round(sum(data$know_od, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
+
+```{r echo=FALSE, fig.height=2.5, fig.width=8}
+myvars <- c('know_od', 'know_add')
+graph <- filter(jurisdiction,n() > 4)
+graph <- aggregate(graph[myvars], list(graph$jurisdiction), sum, na.rm = TRUE)
+graph <- melt(graph,id.vars="Group.1")
+graphlabels <- c("Do you know someone who has experienced an overdose?","Do you know someone who has a substance use disorder?")
+
+ggplot(graph, aes(variable, value)) +
+  geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
+  ylab("Number of Officers that Answered Yes") +
+  labs(title = "Personal Connection to Epidemic", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
+  scale_x_discrete(name = "Question", labels = str_wrap(graphlabels, width = 15)) +
+  coord_flip() +
+  scale_fill_grey()
+```
