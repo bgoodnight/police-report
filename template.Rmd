@@ -1,8 +1,8 @@
 ---
 title: "Preliminary State Report"
 output:
-  pdf_document: default
   word_document: default
+  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -22,85 +22,69 @@ if (!exists("survey")) {
 }
 data$jurisdiction <- sub("^$", "None Specified", data$jurisdiction)
 jurisdiction <- group_by(data[ which(data$jurisdiction!=''),], jurisdiction)
+jurisdiction <- jurisdiction[ which(jurisdiction$jurisdiction!='None Specified'), ]
 ```
 
 # State Report for `r state.name[grep(state, state.abb)]`
 
-Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` that took this survey, **`r sum(data$num_overdose_calls>0, na.rm=TRUE)`** officers reported having responded to an overdose call within the past six months. This accounted for **`r round(sum(data$num_overdose_calls>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers.
+Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` that took this survey, **`r sum(data$num_overdose_calls>0, na.rm=TRUE)`** officers reported having responded to an overdose call within the past six months. This accounted for **`r round(sum(data$num_overdose_calls>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers.
 
 The **`r nrow(data)`** officers that responded to this survey reported a total of **`r sum(data$num_overdose_calls, na.rm=TRUE)`** overdose calls within the past six months, with each of the **`r sum(data$num_overdose_calls>0, na.rm=TRUE)`** officers that responded to a call reporting an average of **`r round(sum(data$num_overdose_calls, na.rm=TRUE)/sum(data$num_overdose_calls>0, na.rm=TRUE),2)`** calls per officer.
 
-```{r echo=FALSE, fig.height=1.5, fig.width=8}
-myvars <- c('num_overdose_calls')
-graph <- filter(jurisdiction,n() > 4)
-graph <- aggregate(graph[myvars], list(graph$jurisdiction), sum, na.rm = TRUE)
-graph <- melt(graph,id.vars="Group.1")
-graphlabels <- c("How many overdose calls have you responded to?")
-
-ggplot(graph, aes(variable, value)) +
-  geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
-  ylab("Number of Calls in last 6 months") +
-  labs(title = "Number of Calls by Jurisdiction", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
-  scale_x_discrete(name = "Question", labels = str_wrap(graphlabels, width = 15)) +
-  coord_flip() +
-  scale_fill_grey()
-```
-
-**`r sum(data$narcan_carry>0, na.rm=TRUE)`** officers reported working in departments that equip some or all officers to carry naloxone (this may not mean that every officer is equipped with naloxone). This accounted for **`r round(sum(data$narcan_carry>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
-
-**`r sum(data$num_naloxone_administer>0, na.rm=TRUE)`** officers in `r state.name[grep(state, state.abb)]` reported having reversed an overdose with naloxone in the past six months, accounting for **`r round(sum(data$num_naloxone_administer>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers. There were a total of **`r sum(data$num_naloxone_administer, na.rm=TRUE)`** overdose reversals reported, with each of the **`r sum(data$num_naloxone_administer>0, na.rm=TRUE)`** officers that reported reversing an overdose reporting **`r round(sum(data$num_naloxone_administer, na.rm=TRUE)/sum(data$num_naloxone_administer>0, na.rm=TRUE),2)`** reversals per officer.
+**`r sum(data$num_naloxone_administer>0, na.rm=TRUE)`** officers in `r state.name[grep(state, state.abb)]` reported having reversed an overdose with naloxone in the past six months, accounting for **`r round(sum(data$num_naloxone_administer>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers. There were a total of **`r sum(data$num_naloxone_administer, na.rm=TRUE)`** overdose reversals reported, with each of the **`r sum(data$num_naloxone_administer>0, na.rm=TRUE)`** officers that reported reversing an overdose reporting **`r round(sum(data$num_naloxone_administer, na.rm=TRUE)/sum(data$num_naloxone_administer>0, na.rm=TRUE),2)`** reversals per officer.
 
 ```{r echo=FALSE, fig.height=2.5, fig.width=8}
-myvars <- c('num_naloxone_administer', 'narcan_carry')
+myvars <- c('num_naloxone_administer','num_overdose_calls')
 graph <- filter(jurisdiction,n() > 4)
-graph <- aggregate(graph[myvars], list(graph$jurisdiction), sum, na.rm = TRUE)
+graph <- aggregate(graph[myvars], list(graph$jurisdiction), mean, na.rm = TRUE)
 graph <- melt(graph,id.vars="Group.1")
-graphlabels <- c("Number of overdoses reversed in last six months","Department equipped to carry narcan")
+graphlabels <- c("Number of overdoses reversed","Number of overdose calls responded to")
 
 ggplot(graph, aes(variable, value)) +
   geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
-  ylab("Reported Rates") +
-  labs(title = "Rates by Jurisdiction", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
+  ylab("Average per officer") +
+  labs(title = "Overdose Responses Per Officer by Jurisdiction in Last 6 Months", fill = "Jurisdiction", caption = paste("Includes only jurisdictions with five or more officers")) +
   scale_x_discrete(name = "Question", labels = str_wrap(graphlabels, width = 15)) +
   coord_flip() +
   scale_fill_grey()
 ```
 
-\newpage
+**`r sum(data$narcan_carry>0, na.rm=TRUE)`** officers reported working in departments that equip some or all officers to carry naloxone (this may not mean that every officer is equipped with naloxone). This accounted for **`r round(sum(data$narcan_carry>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers in `r state.name[grep(state, state.abb)]`.
+
+```{r echo=FALSE, fig.height=1.5, fig.width=8}
+myvars <- c('narcan_carry')
+graph <- filter(jurisdiction,n() > 4)
+graph <- aggregate(graph[myvars], list(graph$jurisdiction), mean, na.rm = TRUE)
+graph <- melt(graph,id.vars="Group.1")
+graphlabels <- c("Department equipped to carry narcan")
+
+ggplot(graph, aes(variable, value)) +
+  geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
+  ylab("Percent of Officers Reporting Departmental Naloxone Use") +
+  labs(title = "Naloxone Use by Jurisdiction", fill = "Jurisdiction", caption = paste("Includes only jurisdictions with five or more officers")) +
+  scale_y_continuous(labels = percent_format(), limits = c(0,1)) +
+  scale_x_discrete(name = "Question", labels = str_wrap(graphlabels, width = 15)) +
+  coord_flip() +
+  scale_fill_grey()
+```
 
 ## Officers that responded to overdose calls
 
 The following are results from the **`r sum(data$num_overdose_calls>0, na.rm=TRUE)`** officers in `r state.name[grep(state, state.abb)]` that responded to at least one overdose call in the past 6 months.
 
-Of the **`r sum(data$num_overdose_calls, na.rm=TRUE)`** overdose calls responded to in the past 6 months by **`r sum(data$num_overdose_calls>0, na.rm=TRUE)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$od_arrest, na.rm=TRUE)`** of those calls resulted in the victim of an overdose being arrested. This accounted for **`r round(sum(data$od_arrest>0, na.rm=TRUE)/sum(data$num_overdose_calls, na.rm=TRUE)*100,2)`%** of all calls. 
+Of the **`r sum(data$num_overdose_calls, na.rm=TRUE)`** overdose calls responded to in the past 6 months by **`r sum(data$num_overdose_calls>0, na.rm=TRUE)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$od_arrest, na.rm=TRUE)`** of those calls resulted in the victim of an overdose being arrested. This accounted for **`r round(sum(data$od_arrest, na.rm=TRUE)/sum(data$num_overdose_calls, na.rm=TRUE)*100,2)`%** of all calls. 
 
-Of the **`r sum(data$num_overdose_calls, na.rm=TRUE)`** overdose calls in the past 6 months in `r state.name[grep(state, state.abb)]`, **`r sum(data$overdose_witness_arrest, na.rm=TRUE)`** of those calls resulted in a witness to an overdose being arrested. This accounted for **`r round(sum(data$overdose_witness_arrest>0, na.rm=TRUE)/sum(data$num_overdose_calls, na.rm=TRUE)*100,2)`%** of all calls. 
-
-```{r echo=FALSE, fig.height=2.5, fig.width=8}
-myvars <- c('overdose_witness_arrest','od_arrest')
-graph <- filter(jurisdiction,n() > 4)
-graph <- aggregate(graph[myvars], list(graph$jurisdiction), sum, na.rm = TRUE)
-graph <- melt(graph,id.vars="Group.1")
-graphlabels <- c("How many witnesses to an overdose were arrested?","How many overdose victims were arrested?")
-
-ggplot(graph, aes(variable, value)) +
-  geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
-  ylab("Number of Arrests") +
-  labs(title = "Number of Arrests Resulting from Overdose Calls", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
-  scale_x_discrete(name = "Question", labels = str_wrap(graphlabels, width = 15)) +
-  coord_flip() +
-  scale_fill_grey()
-```
+Of the **`r sum(data$num_overdose_calls, na.rm=TRUE)`** overdose calls in the past 6 months in `r state.name[grep(state, state.abb)]`, **`r sum(data$overdose_witness_arrest, na.rm=TRUE)`** of those calls resulted in a witness to an overdose being arrested. This accounted for **`r round(sum(data$overdose_witness_arrest, na.rm=TRUE)/sum(data$num_overdose_calls, na.rm=TRUE)*100,2)`%** of all calls. 
 
 \newpage
 
 ##Knowledge
 
-Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$gsl_na, na.rm=TRUE)`** responded correctly when asked whether `r state.name[grep(state, state.abb)]` has a 911 Good Samaritan Law in effect. This accounted for **`r round(sum(data$gsl_na>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
+Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$gsl_na, na.rm=TRUE)`** responded correctly when asked whether `r state.name[grep(state, state.abb)]` has a 911 Good Samaritan Law in effect. This accounted for **`r round(sum(data$gsl_na>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers in `r state.name[grep(state, state.abb)]`.
 
-**`r sum(data$gsl_arrest, na.rm=TRUE)`** of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` responded correctly when asked whether `r state.name[grep(state, state.abb)]` provides immunity from arrest. This accounted for **`r round(sum(data$gsl_arrest>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers.
+**`r sum(data$gsl_arrest, na.rm=TRUE)`** of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` responded correctly when asked whether `r state.name[grep(state, state.abb)]` provides immunity from arrest. This accounted for **`r round(sum(data$gsl_arrest>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers.
 
-**`r sum(data$gsl_charge, na.rm=TRUE)`** officers responded correctly when asked whether `r state.name[grep(state, state.abb)]` provides immunity from criminal charges. This accounted for **`r round(sum(data$gsl_charge>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
+**`r sum(data$gsl_charge, na.rm=TRUE)`** officers responded correctly when asked whether `r state.name[grep(state, state.abb)]` provides immunity from criminal charges. This accounted for **`r round(sum(data$gsl_charge>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers in `r state.name[grep(state, state.abb)]`.
 
 
 ```{r echo=FALSE, fig.height=3.5, fig.width=8}
@@ -113,7 +97,7 @@ graphlabels <- c("Does your state's GSL protect against charges?","Does your sta
 ggplot(graph, aes(variable, value)) +
   geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
   ylab("Percent of Officers that Answered Correctly") +
-  labs(title = "Knowledge of GSL by Jurisdiction", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
+  labs(title = "Knowledge of GSL by Jurisdiction", fill = "Jurisdiction", caption = paste("Includes only jurisdictions with five or more officers")) +
   scale_y_continuous(labels = percent_format(), limits = c(0,1)) +
   scale_x_discrete(name = "Question", labels = str_wrap(graphlabels, width = 15)) +
   coord_flip() +
@@ -124,24 +108,7 @@ ggplot(graph, aes(variable, value)) +
 
 ## Training
 
-```{r echo=FALSE, fig.height=5, fig.width=8}
-myvars <- c('add_training_identify_and_respon',	'add_training_safe_handling',	'add_training_science_of_addictio',	'add_training_txt_addiction',	'add_training_procedures_of_gsl',	'add_training_services_available')
-graph <- filter(jurisdiction,n() > 4)
-graph <- aggregate(graph[myvars], list(graph$jurisdiction), mean, na.rm = TRUE)
-graph <- melt(graph,id.vars="Group.1")
-graphlabels <- c("Identify and Respond to OD","Safe Handling of Opioids or Substances","Science of Addiction","Treatments for Addiction","State GSL Procedures","Treatment Services Available")
-
-ggplot(graph, aes(variable, value)) +
-  geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
-  ylab("Percent of Officers that Want Training") +
-  labs(title = "Training Needs by Jurisdiction", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
-  scale_y_continuous(labels = percent_format(), limits = c(0,1)) +
-  scale_x_discrete(name = "Type of Training", labels = str_wrap(graphlabels, width = 15)) +
-  coord_flip() +
-  scale_fill_grey()
-```
-
-Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$add_training_identify_and_respon>0, na.rm=TRUE)`** stated that they would like additional training in **Identifying and responding to opioid overdoses**. This accounted for **`r round(sum(data$add_training_identify_and_respon>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
+Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$add_training_identify_and_respon>0, na.rm=TRUE)`** stated that they would like additional training in **Identifying and responding to opioid overdoses**. This accounted for **`r round(sum(data$add_training_identify_and_respon>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers in `r state.name[grep(state, state.abb)]`.
 
 **`r sum(data$add_training_safe_handling>0, na.rm=TRUE)`** officers (**`r round(sum(data$add_training_safe_handling>0, na.rm=TRUE)/nrow(data)*100,2)`%**) reported they would like additional training in **The safe handling of opioids and other illicit substances in the field**.
 
@@ -151,7 +118,25 @@ Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]`, **
 
 **`r sum(data$add_training_services_available>0, na.rm=TRUE)`** officers (**`r round(sum(data$add_training_services_available>0, na.rm=TRUE)/nrow(data)*100,2)`%**) reported they would like training in **Medical, social, and psychological services available in `r state.name[grep(state, state.abb)]` for people experiencing opioid use disorder (addiction) and their families**.
 
-Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$add_training_na>0, na.rm=TRUE)`** reported that the **Training already received is satisfactory**. This accounted for **`r round(sum(data$add_training_na>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
+
+```{r echo=FALSE, fig.height=6, fig.width=8}
+myvars <- c('add_training_services_available', 'add_training_procedures_of_gsl',	'add_training_txt_addiction',	'add_training_science_of_addictio',	'add_training_safe_handling',	'add_training_identify_and_respon')
+graph <- filter(jurisdiction,n() > 4)
+graph <- aggregate(graph[myvars], list(graph$jurisdiction), mean, na.rm = TRUE)
+graph <- melt(graph,id.vars="Group.1")
+graphlabels <- c("Treatment Services Available","State GSL Procedures","Treatments for Addiction","Science of Addiction","Safe Handling of Opioids or Substances","Identify and Respond to OD")
+
+ggplot(graph, aes(variable, value)) +
+  geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
+  ylab("Percent of Officers that Want Training") +
+  labs(title = "Training Needs by Jurisdiction", fill = "Jurisdiction", caption = paste("Includes only jurisdictions with five or more officers")) +
+  scale_y_continuous(labels = percent_format(), limits = c(0,1)) +
+  scale_x_discrete(name = "Type of Training", labels = str_wrap(graphlabels, width = 15)) +
+  coord_flip() +
+  scale_fill_grey()
+```
+
+Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$add_training_na>0, na.rm=TRUE)`** reported that the **Training already received is satisfactory**. This accounted for **`r round(sum(data$add_training_na>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers in `r state.name[grep(state, state.abb)]`.
 
 ### Other training topics suggested
 
@@ -172,7 +157,21 @@ qplot(graphdata) +
   geom_bar() +
   scale_x_continuous(name = 'Attitude of Department', breaks = 1:5, labels=c('Overwhelmingly negative','Generally negative','Mixed','Generally positive','Overwhelmingly positive')) +
   ylab("Number of Ratings") +
-  labs(title = "Attitude Toward Naloxone") +
+  labs(title = "Departmental Attitude on Naloxone") +
+  coord_flip() +
+  scale_fill_grey()
+```
+
+The following graph depicts how officers responded to the question "How does carrying naloxone affect your ability to protect and serve the public?":
+
+```{r echo=FALSE, message=FALSE}
+library(ggplot2)
+graphdata = recode(data$naloxone_to_protect, 'Greatly worsens'=1,'Somewhat worsens'=2,'No difference'=3,'Somewhat improves'=4,'Greatly improves'=5)
+qplot(graphdata) + 
+  geom_bar() +
+  scale_x_continuous(name = 'Attitude of Officers', breaks = 1:5, labels=c('Greatly worsens','Somewhat worsens','No difference','Somewhat improves','Greatly improves')) +
+  ylab("Number of Ratings") +
+  labs(title = "Effect of Naloxone on Ability to Serve") +
   coord_flip() +
   scale_fill_grey()
 ```
@@ -233,22 +232,23 @@ Of the 2869 patrol officers from 20 states that participated in this survey `r n
 
 ### Personal Connection to the Opioid Epidemic
 
-**`r sum(data$know_add, na.rm=TRUE)`** out of **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` reported that they personally know someone who has lived with a substance use disorder. This constitutes **`r round(sum(data$know_add, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
+**`r sum(data$know_add, na.rm=TRUE)`** out of **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` reported that they personally know someone who has lived with a substance use disorder. This constitutes **`r round(sum(data$know_add, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers in `r state.name[grep(state, state.abb)]`.
 
-**`r sum(data$know_od, na.rm=TRUE)`** officers in `r state.name[grep(state, state.abb)]` reported that they know someone who has experienced an overdose. This constitutes **`r round(sum(data$know_od, na.rm=TRUE)/nrow(data)*100,2)`%** of all officers in `r state.name[grep(state, state.abb)]`.
+**`r sum(data$know_od, na.rm=TRUE)`** officers in `r state.name[grep(state, state.abb)]` reported that they know someone who has experienced an overdose. This constitutes **`r round(sum(data$know_od, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers in `r state.name[grep(state, state.abb)]`.
 
 ```{r echo=FALSE, fig.height=2.5, fig.width=8}
 myvars <- c('know_od', 'know_add')
 graph <- filter(jurisdiction,n() > 4)
-graph <- aggregate(graph[myvars], list(graph$jurisdiction), sum, na.rm = TRUE)
+graph <- aggregate(graph[myvars], list(graph$jurisdiction), mean, na.rm = TRUE)
 graph <- melt(graph,id.vars="Group.1")
 graphlabels <- c("Do you know someone who has experienced an overdose?","Do you know someone who has a substance use disorder?")
 
 ggplot(graph, aes(variable, value)) +
   geom_bar(aes(fill = Group.1), position = "dodge", stat="identity", color="black") +
-  ylab("Number of Officers that Answered Yes") +
-  labs(title = "Personal Connection to Epidemic", fill = "Jurisdiction", caption = paste("Excludes jurisdictions with fewer than 5 officers")) +
+  ylab("Percent of Officers that Answered Yes") +
+  labs(title = "Personal Connection to Epidemic", fill = "Jurisdiction", caption = paste("Includes only jurisdictions with five or more officers")) +
   scale_x_discrete(name = "Question", labels = str_wrap(graphlabels, width = 15)) +
+  scale_y_continuous(labels = percent_format(), limits = c(0,1)) +
   coord_flip() +
   scale_fill_grey()
 ```
