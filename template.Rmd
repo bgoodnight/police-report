@@ -1,8 +1,8 @@
 ---
 title: "Preliminary State Report"
 output:
-  pdf_document: default
   word_document: default
+  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -150,12 +150,12 @@ Officers in `r state.name[grep(state, state.abb)]` provided the following qualit
 
 The following graph depicts how officers reported the attitude of officers in their department about carrying and administering naloxone:
 
-```{r echo=FALSE, message=FALSE, fig.height=4.5, fig.width=8}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.height=4.5, fig.width=8}
 library(ggplot2)
 graphdata = recode(data$attitude_of_naloxone, 'Overwhelmingly negative'=1,'Generally negative'=2,'Mixed'=3,'Generally positive'=4,'Overwhelmingly positive'=5)
 qplot(graphdata) + 
   geom_bar() +
-  scale_x_continuous(name = 'Attitude of Department', breaks = 1:5, labels=c('Overwhelmingly negative','Generally negative','Mixed','Generally positive','Overwhelmingly positive')) +
+  scale_x_continuous(name = 'Attitude of Department', breaks = 1:5, labels=c('Overwhelmingly negative','Generally negative','Mixed','Generally positive','Overwhelmingly positive'), limits=c(0.5,5.5)) +
   ylab("Number of Ratings") +
   labs(title = "Departmental Attitude on Naloxone") +
   coord_flip() +
@@ -164,12 +164,12 @@ qplot(graphdata) +
 
 The following graph depicts how officers responded to the question "How does carrying naloxone affect your ability to protect and serve the public?":
 
-```{r echo=FALSE, message=FALSE, fig.height=4.5, fig.width=8}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.height=4.5, fig.width=8}
 library(ggplot2)
 graphdata = recode(data$naloxone_to_protect, 'Greatly worsens'=1,'Somewhat worsens'=2,'No difference'=3,'Somewhat improves'=4,'Greatly improves'=5)
 qplot(graphdata) + 
   geom_bar() +
-  scale_x_continuous(name = 'Attitude of Officers', breaks = 1:5, labels=c('Greatly worsens','Somewhat worsens','No difference','Somewhat improves','Greatly improves')) +
+  scale_x_continuous(name = 'Attitude of Officers', breaks = 1:5, labels=c('Greatly worsens','Somewhat worsens','No difference','Somewhat improves','Greatly improves'), limits=c(0.5,5.5)) +
   ylab("Number of Ratings") +
   labs(title = "Effect of Naloxone on Ability to Serve") +
   coord_flip() +
