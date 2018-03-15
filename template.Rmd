@@ -51,7 +51,7 @@ ggplot(graph, aes(variable, value)) +
 
 **`r sum(data$narcan_carry>0, na.rm=TRUE)`** officers reported working in departments that equip some or all officers to carry naloxone (this may not mean that every officer is equipped with naloxone). This accounted for **`r round(sum(data$narcan_carry>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers in `r state.name[grep(state, state.abb)]`.
 
-```{r echo=FALSE, fig.height=1.5, fig.width=8}
+```{r echo=FALSE, fig.height=1.7, fig.width=8}
 myvars <- c('narcan_carry')
 graph <- filter(jurisdiction,n() > 4)
 graph <- aggregate(graph[myvars], list(graph$jurisdiction), mean, na.rm = TRUE)
@@ -80,16 +80,17 @@ Of the **`r sum(data$num_overdose_calls, na.rm=TRUE)`** overdose calls in the pa
 
 ##Knowledge
 
-Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$gsl_na, na.rm=TRUE)`** responded correctly when asked whether `r state.name[grep(state, state.abb)]` has a 911 Good Samaritan Law in effect. This accounted for **`r round(sum(data$gsl_na>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers in `r state.name[grep(state, state.abb)]`.
+Of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]`, **`r sum(data$gsl_na==0, na.rm=TRUE)`** responded correctly when asked whether `r state.name[grep(state, state.abb)]` has a 911 Good Samaritan Law in effect. This accounted for **`r round(sum(data$gsl_na==0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers in `r state.name[grep(state, state.abb)]`.
 
-**`r sum(data$gsl_arrest, na.rm=TRUE)`** of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` responded correctly when asked whether `r state.name[grep(state, state.abb)]` provides immunity from arrest. This accounted for **`r round(sum(data$gsl_arrest>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers.
+**`r sum(data$gsl_arrest, na.rm=TRUE)`** of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` responded correctly when asked whether `r state.name[grep(state, state.abb)]` provides immunity from arrest. This accounted for **`r round(sum(data$gsl_arrest, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers.
 
-**`r sum(data$gsl_charge, na.rm=TRUE)`** officers responded correctly when asked whether `r state.name[grep(state, state.abb)]` provides immunity from criminal charges. This accounted for **`r round(sum(data$gsl_charge>0, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers in `r state.name[grep(state, state.abb)]`.
+**`r sum(data$gsl_charge, na.rm=TRUE)`** officers responded correctly when asked whether `r state.name[grep(state, state.abb)]` provides immunity from criminal charges. This accounted for **`r round(sum(data$gsl_charge, na.rm=TRUE)/nrow(data)*100,2)`%** of all participating officers in `r state.name[grep(state, state.abb)]`.
 
 
 ```{r echo=FALSE, fig.height=3.5, fig.width=8}
 myvars <- c('gsl_charge',	'gsl_arrest',	'gsl_na')
 graph <- filter(jurisdiction,n() > 4)
+graph$gsl_na <- (graph$gsl_na-1)*-1
 graph <- aggregate(graph[myvars], list(graph$jurisdiction), mean, na.rm = TRUE)
 graph <- melt(graph,id.vars="Group.1")
 graphlabels <- c("Does your state's GSL protect against charges?","Does your state's GSL protect against arrest?","Does your state have a GSL in effect?")
@@ -150,7 +151,7 @@ Officers in `r state.name[grep(state, state.abb)]` provided the following qualit
 
 The following graph depicts how officers reported the attitude of officers in their department about carrying and administering naloxone:
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.height=4.5, fig.width=8}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.width=8}
 library(ggplot2)
 graphdata = recode(data$attitude_of_naloxone, 'Overwhelmingly negative'=1,'Generally negative'=2,'Mixed'=3,'Generally positive'=4,'Overwhelmingly positive'=5)
 qplot(graphdata) + 
@@ -164,7 +165,7 @@ qplot(graphdata) +
 
 The following graph depicts how officers responded to the question "How does carrying naloxone affect your ability to protect and serve the public?":
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.height=4.5, fig.width=8}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.width=8}
 library(ggplot2)
 graphdata = recode(data$naloxone_to_protect, 'Greatly worsens'=1,'Somewhat worsens'=2,'No difference'=3,'Somewhat improves'=4,'Greatly improves'=5)
 qplot(graphdata) + 
@@ -175,6 +176,8 @@ qplot(graphdata) +
   coord_flip() +
   scale_fill_grey()
 ```
+
+\newpage
 
 The following reflect how many of the **`r nrow(data)`** officers in `r state.name[grep(state, state.abb)]` AGREED with the following statements:
 
@@ -216,8 +219,6 @@ Officers in `r state.name[grep(state, state.abb)]` provided the following feedba
 - Fire Departments: **`r sum(data$agencies_fire_departments)`** out of **`r sum(data$agencies_fire_departments!='NA')`** officers (**`r round(sum(data$agencies_fire_departments)/sum(data$agencies_fire_departments!='NA')*100,2)`%**) believe **Fire Departments** should be involved.
 - EMS: **`r sum(data$agencies_ems)`** out of **`r sum(data$agencies_ems!='NA')`** officers (**`r round(sum(data$agencies_ems)/sum(data$agencies_ems!='NA')*100,2)`%**) believe that **EMS** should be involved.
 - Public Health Agencies: **`r sum(data$agencies_public_health)`** out of **`r sum(data$agencies_public_health!='NA')`** officers (**`r round(sum(data$agencies_public_health)/sum(data$agencies_public_health!='NA')*100,2)`%**) reported that **Public Health Agencies** should be involved.
-
-\newpage
 
 ## Demographics
 
