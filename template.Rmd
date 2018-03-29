@@ -17,7 +17,7 @@ library(stringr)
 knitr::opts_chunk$set(echo = TRUE)
 if (!exists("survey")) { 
      survey = read.csv('data.csv')
-     state <- 'KY'
+     state <- 'GA'
      data <- survey[ which(survey$state==state ), ]
 }
 data$jurisdiction <- sub("^$", "None Specified", data$jurisdiction)
@@ -36,6 +36,7 @@ The **`r nrow(data)`** officers that responded to this survey reported a total o
 ```{r echo=FALSE, fig.height=2.5, fig.width=8}
 myvars <- c('num_naloxone_administer','num_overdose_calls')
 graph <- filter(jurisdiction,n() > 4)
+graph[,myvars][graph[,myvars] == 0] <- NA
 graph <- aggregate(graph[myvars], list(graph$jurisdiction), mean, na.rm = TRUE)
 graph <- melt(graph,id.vars="Group.1")
 graphlabels <- c("Number of overdoses reversed","Number of overdose calls responded to")
